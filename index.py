@@ -41,7 +41,7 @@ class Sudoku():
         self.fremeGrill.place(x=160, y=30, width=self.lon * 0.47, height=self.lar * 0.8)
         for i in range(0, 9):
             for j in range(0, 9):
-                grivide[i][j]=Entry(self.fremeGrill, font=('Times romans', 15, 'bold'), width=3, bd=5,justify='center',cursor=("hand2"))
+                grivide[i][j]=Entry(self.fremeGrill, font=('Times romans', 15, 'bold'), width=3, bd=5,justify='center')
                 grivide[i][j].grid(row=i,column=j)
         self.fremeGrille = Frame(self.fremeGrill, bg='green')
         self.fremeGrille.place(x=0, y=330, width=self.lon * 0.449, height=self.lar * 0.09)
@@ -89,7 +89,7 @@ class Sudoku():
         self.temps=15
         self.choiNiveau()
         self.gridresolu=facile.gridresolu
-        self.gridcharge = facile.gridresolu
+        self.gridcharge = facile.gridcharge
         self.generation()
 
 
@@ -138,6 +138,7 @@ class Sudoku():
                         if grivide[i][j].get() == grivide[i][k + 1].get():
                             grivide[i][j]['bg'] = "Crimson"
                             grivide[i][k + 1]['bg'] = "Crimson"
+                            #messagebox.showinfo("erreur", "une valeur ne doit être repetee sur une ligne")
                             return False
 
                     if str(grivide[j][i].get()) != "" and str(grivide[k + 1][i].get()) != "":
