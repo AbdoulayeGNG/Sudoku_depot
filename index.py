@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 from random import choice
 from grillevide import grivide
+from AIDE import doc
 import facile
 import moyen
 import difficile
@@ -41,7 +42,7 @@ class Sudoku():
         self.fremeGrill.place(x=160, y=30, width=self.lon * 0.47, height=self.lar * 0.8)
         for i in range(0, 9):
             for j in range(0, 9):
-                grivide[i][j]=Entry(self.fremeGrill, font=('Times romans', 15, 'bold'), width=3, bd=5,justify='center')
+                grivide[i][j]=Entry(self.fremeGrill, font=('Times romans', 15, 'bold'), width=3, bd=5, justify='center')
                 grivide[i][j].grid(row=i,column=j)
         self.fremeGrille = Frame(self.fremeGrill, bg='green')
         self.fremeGrille.place(x=0, y=330, width=self.lon * 0.449, height=self.lar * 0.09)
@@ -52,7 +53,7 @@ class Sudoku():
         baide = Button(self.fremeGrille, text="Aide", font=('times roman', 15, 'bold'), bg='green',command=self.aide)
         baide.grid(row=0, column=7, pady=4, padx=15)
     def aide(self):
-        messagebox.showinfo('Aide','sudoku à deux à manipuler')
+        messagebox.showinfo("AIDE ", doc())
     def jouer(self):
         self.fremeGrille = Frame(self.fremeGrill, bg='green')
         self.fremeGrille.place(x=0, y=330, width=self.lon * 0.449, height=self.lar * 0.09)
@@ -86,7 +87,7 @@ class Sudoku():
         bquitter = Button(self.fremeGrille, text="Quitter", font=('times roman', 15, 'bold'), bg='green',command=self.window.quit, cursor=("hand2"))
         bquitter.grid(row=0, column=3, columnspan=3, pady=4, padx=4)
     def facile(self):
-        self.temps=15
+        self.temps=20
         self.choiNiveau()
         self.gridresolu=facile.gridresolu
         self.gridcharge = facile.gridcharge
@@ -94,20 +95,19 @@ class Sudoku():
 
 
     def moyen(self):
-        self.temps = 10
+        self.temps = 15
         self.choiNiveau()
         self.gridcharge=moyen.gridcharge
         self.gridresolu = moyen.gridresolu
         self.generation()
     def difficile(self):
-       self.temps = 6* 60
        self.choiNiveau()
-       self.temps = 7
+       self.temps = 10
        self.gridcharge = difficile.gridcharge
        self.gridresolu = difficile.gridresolu
        self.generation()
     def expert(self):
-       self.temps = 4
+       self.temps = 8
        self.choiNiveau()
        self.gridcharge = expert.gridcharge
        self.gridresolu = expert.gridresolu
@@ -138,14 +138,17 @@ class Sudoku():
                         if grivide[i][j].get() == grivide[i][k + 1].get():
                             grivide[i][j]['bg'] = "Crimson"
                             grivide[i][k + 1]['bg'] = "Crimson"
-                            #messagebox.showinfo("erreur", "une valeur ne doit être repetee sur une ligne")
+                            messagebox.showwarning("erreur", "une valeur ne doit être repetee sur une ligne")
                             return False
 
                     if str(grivide[j][i].get()) != "" and str(grivide[k + 1][i].get()) != "":
                         if grivide[j][i].get() == grivide[k + 1][i].get():
                             grivide[j][i]['bg'] = "Crimson"
                             grivide[k + 1][i]['bg'] = "Crimson"
+                            messagebox.showwarning("erreur", "une valeur ne doit être repetee sur une colone")
+
                             return False
+
 
 
 
@@ -159,22 +162,25 @@ class Sudoku():
                     if bloc[a] != "" and bloc.count(bloc[a])>1:
                         messagebox.showerror("Erreur", "une valeur ne doit pas être répétée  dans une même région")
                         return False
+        for i in range(9):
+            for j in range(9):
+                if str(grivide[i][j].get()) not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", ""]:
+                    grivide[i][j]['bg'] = "Crimson"
+                    #messagebox.showwarning("Erreur", "veuillez saisir une valeur comprise entre 1 et 9")
+                elif str(grivide[i][j].get()) in ["1", "2", "3", "4", "5", "6", "7", "8", "9", ""]:
+                    grivide[i][j]['bg'] = "white"
+
+
         return True
 
     def verifFinal(self):
         for i in range(9):
             for j in range(9):
-                if str(grivide[i][j].get()) not in ["1", "2", "3", "4", "5", "6", "7", "8", "9",""]:
-                    grivide[i][j]['bg'] = "Crimson"
-                    return False
-                elif str(grivide[i][j].get()) in ["1", "2", "3", "4", "5", "6", "7", "8", "9", ""]:
-                    grivide[i][j]['bg'] = "white"
-
                 if grivide[i][j].get() == "":
                     return False
         return True
     def finverification(self):
-        if self.verifFinal() and self.verification():
+        if self.verification() and self.verifFinal():
            b=messagebox.askyesno("Resultat", "Bravo vous avez gagnez!\n\nvoulez vous jouer à nouveau?")
            if int(b)>0:
               self.affichageFreme()
@@ -210,9 +216,22 @@ class Sudoku():
             secondes = (duree_en_secondes % 3600) % 60
             self.duree.set("{:02d}:{:02d}:{:02d}".format(heures, self.minutes, secondes))
             self.reverification+=1
-            if self.minutes == self.temps :
-                self.verifFinal()
-                self.en_cours=False
+            if self.minutes == self.temps:
+                if self.verifFinal() and self.verification():
+                   d=messagebox.askyesno("Resultat","Félicitations vous avez gagné!\n\nVoulez vous continuer")
+                   self.en_cours=False
+                   if int(d)>0:
+                       self.affichageFreme()
+                   else:
+                       self.window.quit()
+                else:
+                    v = messagebox.askyesno("Resultat", "Vous avez echoué!\n\nVoulez vous jouer à nouveau")
+                    if int(v) > 0:
+                        self.affichageFreme()
+                    else:
+                        self.window.quit()
+
+
             if self.reverification == 5:
                 self.verification()
                 self.finverification()
